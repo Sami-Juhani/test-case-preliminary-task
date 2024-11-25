@@ -61,7 +61,7 @@ python main.py
 To quickly verify that the pipeline has executed correctly, you can use the SQLite command-line interface:
 
 ```
-sqlite3 db/reagle_test.db
+sqlite3 db/applications.db
 ```
 
 Use the following command to check the tables in the database:
@@ -81,6 +81,14 @@ SELECT COUNT(*) FROM vantaa_open_applications;
 The ```run_etl``` function accepts one parameter, which is the database connection string. For SQLite, the format is ```sqlite:///path/to/database/file```. You can also specify a different file path for a test database. While not mandatory, using a separate test database might simplify your workflow.
 
 The pipeline provided does not necessarily need to pass your tests. Your job in this assignment is simply to implement the testing routines, not fix possible issues.
+
+### Testing
+
+To run the tests, you can use the following command:
+
+```
+pytest
+```
 
 ## Running into issues
 
