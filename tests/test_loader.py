@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import patch
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.exc import IntegrityError
 import pandas as pd
 
 from pipeline.etl import SimpleLoader
@@ -58,17 +59,28 @@ class TestSimpleLoader:
         assert not columns['link']['nullable']
 
 
-    def test_loader_db_loading(self, test_db_engine, test_db_connection):
+    def test_db_loading(self, test_db_engine, test_db_connection):
         self._setup_loader(test_db_engine, test_db_connection)
         # Load mock data
         self.loader.load(mock_data_formatted_dates)
-
+        
         # Verify the data is loaded into the table
         result = self.session.query(VantaaOpenApplications).all()
         assert len(result) == len(mock_data_formatted_dates)
 
+    
+    def test_handles_duplicate_entries(self, test_db_engine, test_db_connection):
+        self._setup_loader(test_db_engine, test_db_connection)
+        self.loader.load(mock_data_formatted_dates)
 
-    def test_loader_empty_dataframe(self, test_db_engine, test_db_connection):
+        try:
+            # Attempt to load duplicate entries
+            self.loader.load(mock_data_formatted_dates)
+        except IntegrityError:
+            assert False, "IntegrityError was raised when loading duplicate entries"
+
+
+    def test_empty_dataframe(self, test_db_engine, test_db_connection):
         self._setup_loader(test_db_engine, test_db_connection)
         # Attempt to load an empty DataFrame
         empty_df = pd.DataFrame()
