@@ -50,9 +50,13 @@ class SimpleTransformer:
             lambda datestr: date.fromisoformat(datestr) if pd.notna(datestr) else None
         )
         return df
+    
+    def _validate_data(self, df: pd.DataFrame) -> pd.DataFrame:
+        # TODO: implement data validation
+        return df
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        return df.pipe(self._rename_columns).pipe(self._transform_dates)
+        return df.pipe(self._rename_columns).pipe(self._transform_dates).pipe(self._validate_data)
 
     def __call__(self, df: pd.DataFrame) -> pd.DataFrame:
         return self.transform(df=df)
@@ -63,7 +67,7 @@ class SimpleLoader:
         # Setup Engine
         self.engine = create_engine(conn_str)
 
-    def load(self, df: pd.DataFrame) -> pd.DataFrame:
+    def load(self, df: pd.DataFrame):
         # Load data into database inside session
         session = orm.sessionmaker(bind=self.engine)
         with session() as sess:
@@ -72,7 +76,7 @@ class SimpleLoader:
             )
             sess.commit()
 
-    def __call__(self, df: pd.DataFrame) -> pd.DataFrame:
+    def __call__(self, df: pd.DataFrame):
         self.load(df=df)
 
 
