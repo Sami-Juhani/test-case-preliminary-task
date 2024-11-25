@@ -51,7 +51,7 @@ class TestSimpleTransformer:
 
     def test_data_validation(self):
         df = self.transformer._validate_data(mock_invalid_data)
-        df = mock_invalid_data
+
         # Define schema for validation
         schema = {
             "id": {"type_check": pd.api.types.is_integer_dtype, "nullable": False},
